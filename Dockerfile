@@ -34,13 +34,14 @@ RUN composer install --no-interaction --optimize-autoloader --no-scripts
 # Copy application files
 COPY . .
 
-# Fix permissions (critical step)
+# Fix permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} && \
     chown -R www-data:www-data /var/www && \
     chmod -R 775 storage bootstrap/cache
 
-# Generate application key and cache
-RUN php artisan key:generate && \
+# Prepare environment
+RUN cp .env.example .env || true && \
+    php artisan key:generate || php artisan config:clear && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
