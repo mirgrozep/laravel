@@ -1,22 +1,32 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 ENV COMPOSER_MEMORY_LIMIT=-1
 
-RUN apk add --no-cache \
-    build-base \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     libzip-dev \
     zip \
     unzip \
     curl \
     git \
-    oniguruma-dev \
+    libonig-dev \
     libxml2-dev
 
+# Configure GD with explicit FreeType and JPEG support
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd pdo pdo_mysql zip mbstring bcmath xml ctype tokenizer
+
+# Install PHP extensions one by one (to isolate failures)
+RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql
+RUN docker-php-ext-install -j$(nproc) mbstring bcmath xml ctype tokenizer
+RUN docker-php-ext-install -j$(nproc) zip
+RUN docker-php-ext-install -j$(nproc) gd
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
