@@ -1,22 +1,22 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
 ENV COMPOSER_MEMORY_LIMIT=-1
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
-    build-essential \
+RUN apk add --no-cache \
+    build-base \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     libzip-dev \
     zip \
     unzip \
     curl \
     git \
-    libonig-dev \
-    libxml2-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip mbstring bcmath xml ctype tokenizer \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    oniguruma-dev \
+    libxml2-dev
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd pdo pdo_mysql zip mbstring bcmath xml ctype tokenizer
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
