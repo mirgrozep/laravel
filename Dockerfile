@@ -25,10 +25,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files first for better caching
+# Copy composer files first
 COPY composer.json composer.lock ./
 
-# Install dependencies (run as root first)
+# Install dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
 # Copy application files
@@ -39,15 +39,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
     chown -R www-data:www-data /var/www && \
     chmod -R 775 storage bootstrap/cache
 
-# Run composer scripts as www-data
-USER www-data
-RUN composer dump-autoload --optimize && \
+# Generate application key and cache
+RUN php artisan key:generate && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
-
-# Switch back to root for CMD
-USER root
 
 # Nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
