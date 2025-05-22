@@ -1,6 +1,15 @@
 FROM php:8.2-fpm
 
+
+# Install Nginx
+RUN apt-get update && apt-get install -y nginx
+
+# Copy Nginx config
+COPY nginx.conf /etc/nginx/sites-available/default
+
 ENV COMPOSER_MEMORY_LIMIT=-1
+
+
 
 # Install system dependencies and PHP build dependencies using apt
 RUN apt-get update && apt-get install -y --no-install-recommends \
