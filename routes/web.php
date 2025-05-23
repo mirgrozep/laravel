@@ -114,7 +114,9 @@
 
 // Product Review
     Route::resource('/review', 'ProductReviewController');
-    Route::post('product/{slug}/review', [ProductReviewController::class, 'store'])->name('review.store');
+    // Route::post('product/{slug}/review', [ProductReviewController::class, 'store'])->name('review.store');
+    Route::post('product/{slug}/review', [ProductReviewController::class, 'store'])->name('product.review.store');
+
 
 // Post Comment
     Route::post('post/{slug}/comment', [PostCommentController::class, 'store'])->name('post-comment.store');

@@ -41,10 +41,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
 
 # Prepare environment
 RUN cp .env.example .env || true && \
-    php artisan key:generate || php artisan config:clear && \
+    php artisan key:generate && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
+
 
 # Nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
